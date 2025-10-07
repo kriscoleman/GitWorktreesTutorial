@@ -1,0 +1,131 @@
+name: 🎓 Exercise Help
+description: Get help with a specific tutorial exercise
+title: "[Help] "
+labels: ["help-wanted", "exercise-support"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Need help with an exercise? No problem! We're here to help you learn git worktrees effectively.
+
+  - type: dropdown
+    id: exercise_number
+    attributes:
+      label: Exercise Number
+      description: Which exercise do you need help with?
+      options:
+        - Exercise 1 - Basic Worktree Operations
+        - Exercise 2 - Parallel Feature Development
+        - Exercise 3 - Hotfix Workflow
+        - Exercise 4 - AI Agent Workflows
+        - Exercise 5 - Cleanup and Maintenance
+        - General Setup Issues
+        - Script Usage Questions
+    validations:
+      required: true
+
+  - type: dropdown
+    id: help_type
+    attributes:
+      label: Type of Help Needed
+      description: What kind of help do you need?
+      options:
+        - Exercise won't start/setup issues
+        - Command not working as expected
+        - Validation script failing
+        - Concept clarification
+        - Error message I don't understand
+        - Exercise completed but want to understand better
+        - Stuck on a specific step
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_step
+    attributes:
+      label: Current Step
+      description: What step are you currently on? Copy the step description or number.
+      placeholder: "Step 3: Create Your First Worktree..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: what_tried
+    attributes:
+      label: What You've Tried
+      description: What commands have you run? What have you attempted?
+      placeholder: |
+        1. I ran: git worktree add ../project-feature feature-a
+        2. I tried: cd ../project-feature
+        3. I got this result: ...
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: error_or_issue
+    attributes:
+      label: Error Message or Issue
+      description: What error are you seeing, or what's not working as expected?
+      placeholder: Paste any error messages or describe the unexpected behavior
+      render: shell
+
+  - type: textarea
+    id: current_output
+    attributes:
+      label: Current Git Status
+      description: Please run these commands and paste the output
+      placeholder: |
+        git worktree list
+        git branch -a
+        git status
+        pwd
+      render: shell
+
+  - type: input
+    id: git_version
+    attributes:
+      label: Git Version
+      description: Run `git --version` and paste the result
+      placeholder: "git version 2.39.0"
+    validations:
+      required: true
+
+  - type: input
+    id: operating_system
+    attributes:
+      label: Operating System
+      description: What OS are you using?
+      placeholder: "macOS 13.0, Ubuntu 22.04, Windows 11, etc."
+    validations:
+      required: true
+
+  - type: textarea
+    id: question_or_confusion
+    attributes:
+      label: Specific Question or Confusion
+      description: What specifically are you confused about or want to understand better?
+      placeholder: "I don't understand why we need to create a separate directory for each worktree..."
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Before asking for help, please confirm you've tried these
+      options:
+        - label: I have read the exercise instructions carefully
+          required: true
+        - label: I have tried the suggested troubleshooting steps
+          required: true
+        - label: I have checked my Git version (2.5+ required)
+          required: true
+        - label: I am in the correct directory when running commands
+          required: true
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Anything else that might help us assist you?
+      placeholder: Screenshots, your learning goals, previous Git experience, etc.

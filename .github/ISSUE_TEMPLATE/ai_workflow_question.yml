@@ -1,0 +1,140 @@
+name: 🤖 AI Workflow Question
+description: Questions about using AI tools with git worktrees
+title: "[AI] "
+labels: ["ai-workflows", "question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask questions about integrating AI coding assistants with git worktrees! This is an advanced topic and we're here to help.
+
+  - type: dropdown
+    id: ai_tool
+    attributes:
+      label: AI Tool
+      description: Which AI coding assistant are you using or asking about?
+      options:
+        - Claude Code
+        - GitHub Copilot
+        - Cursor
+        - ChatGPT/GPT-4
+        - Replit Agent
+        - Tabnine
+        - CodeWhisperer
+        - Multiple tools
+        - Other
+        - General AI workflow question
+    validations:
+      required: true
+
+  - type: dropdown
+    id: question_type
+    attributes:
+      label: Question Type
+      description: What aspect of AI + worktrees are you asking about?
+      options:
+        - Setting up multiple AI agents in different worktrees
+        - Coordinating AI work across worktrees
+        - AI agent specialization strategies
+        - Merging AI-generated code from different worktrees
+        - Performance optimization for AI + worktrees
+        - Best practices for AI collaboration
+        - Tool-specific integration questions
+        - AI workflow patterns
+        - Troubleshooting AI + worktree issues
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: question_description
+    attributes:
+      label: Your Question
+      description: Describe your question about AI workflows with worktrees
+      placeholder: "I'm trying to set up multiple Claude Code instances to work on different features simultaneously, but..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: current_setup
+    attributes:
+      label: Current Setup
+      description: Describe your current AI + worktree setup
+      placeholder: |
+        - Project structure: main/, feature-a/, feature-b/
+        - AI tools: Claude Code in main directory
+        - Goal: Have one AI work on frontend, another on backend
+        - Challenge: ...
+
+  - type: textarea
+    id: what_tried
+    attributes:
+      label: What You've Tried
+      description: What approaches have you already attempted?
+      placeholder: "I tried opening multiple terminals with different AI sessions, but..."
+
+  - type: dropdown
+    id: experience_level
+    attributes:
+      label: Experience Level
+      description: How experienced are you with AI-assisted development?
+      options:
+        - Beginner - New to AI coding tools
+        - Intermediate - Used AI tools for simple tasks
+        - Advanced - Experienced with AI workflows
+        - Expert - Developing custom AI integrations
+
+  - type: dropdown
+    id: project_type
+    attributes:
+      label: Project Type
+      description: What type of project are you working on?
+      options:
+        - Web application (frontend + backend)
+        - Mobile application
+        - Desktop application
+        - CLI tool
+        - Library/package
+        - Data science project
+        - DevOps/infrastructure
+        - Other
+
+  - type: textarea
+    id: workflow_goal
+    attributes:
+      label: Desired Workflow
+      description: Describe your ideal AI + worktree workflow
+      placeholder: "I want to have one AI agent focused on React components while another works on the API endpoints, and they should be able to coordinate their work..."
+
+  - type: checkboxes
+    id: specific_interests
+    attributes:
+      label: Specific Interests
+      description: Which AI + worktree topics are you most interested in?
+      options:
+        - Parallel AI development (multiple agents)
+        - AI agent specialization (frontend, backend, testing)
+        - Code integration from multiple AI sources
+        - AI-assisted code review workflows
+        - Performance optimization
+        - Team collaboration with AI agents
+        - Custom AI tool integration
+        - Enterprise AI development patterns
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any other details that would help us provide better guidance?
+      placeholder: "Team size, development timeline, specific challenges, etc."
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm
+      options:
+        - label: I have read the AI Development Guide in the docs/ folder
+        - label: I have completed the basic worktree exercises (1-3)
+        - label: I understand the fundamentals of git worktrees
+          required: true

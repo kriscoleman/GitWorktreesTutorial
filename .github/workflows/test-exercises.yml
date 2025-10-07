@@ -1,0 +1,407 @@
+name: 🎓 Test Exercise Workflows
+
+on:
+  push:
+    paths: 
+      - 'exercises/**'
+      - 'scripts/**'
+  pull_request:
+    paths:
+      - 'exercises/**'
+      - 'scripts/**'
+  workflow_dispatch:
+    inputs:
+      exercise_number:
+        description: 'Exercise number to test (01-05, or "all")'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - 'all'
+          - '01'
+          - '02'
+          - '03'
+          - '04'
+          - '05'
+
+jobs:
+  test-exercise-01:
+    name: 🧪 Test Exercise 1 - Basic Operations
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.exercise_number == 'all' || github.event.inputs.exercise_number == '01' || github.event.inputs.exercise_number == '' }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Git
+      run: |
+        git config user.name "Exercise Test Bot"
+        git config user.email "exercise-test@tutorial.example"
+
+    - name: Test Exercise 1 Steps
+      run: |
+        echo "🎯 Testing Exercise 1: Basic Worktree Operations"
+        echo "================================================"
+        
+        # Step 1: Check current worktree status
+        echo "📋 Step 1: Checking current worktree status"
+        git worktree list
+        
+        # Step 2: Create first worktree
+        echo "🌱 Step 2: Creating first worktree"
+        git worktree add ../GitWorktreesTutorial-feature-a -b feature-a
+        
+        # Step 3: Explore the new worktree
+        echo "🔍 Step 3: Exploring new worktree"
+        cd ../GitWorktreesTutorial-feature-a
+        git branch --show-current | grep -q "feature-a" || { echo "❌ Wrong branch"; exit 1; }
+        pwd
+        
+        # Step 4: Make changes in the new worktree
+        echo "📝 Step 4: Making changes in worktree"
+        echo "# Feature A Development" > feature-a-notes.md
+        git add feature-a-notes.md
+        git commit -m "Add initial notes for feature A"
+        
+        # Step 5: Check worktree list again
+        echo "📊 Step 5: Checking worktree list"
+        git worktree list
+        
+        # Step 6: Navigate back to original directory
+        echo "🔄 Step 6: Returning to main directory"
+        cd ../GitWorktreesTutorial
+        test ! -f feature-a-notes.md || { echo "❌ File should not exist in main"; exit 1; }
+        
+        # Step 7: Create another worktree from existing branch  
+        echo "➕ Step 7: Creating review worktree"
+        git worktree add ../GitWorktreesTutorial-review -b review-branch
+        
+        # Step 8: View detailed worktree info
+        echo "📋 Step 8: Viewing detailed worktree info"
+        git worktree list --porcelain
+        
+        # Step 9: Remove a worktree
+        echo "🗑️ Step 9: Removing review worktree"
+        git worktree remove ../GitWorktreesTutorial-review
+        
+        # Step 10: Verify removal
+        echo "✅ Step 10: Verifying removal"
+        git worktree list
+        ! test -d ../GitWorktreesTutorial-review || { echo "❌ Directory should be removed"; exit 1; }
+        
+        echo "✅ Exercise 1 test completed successfully!"
+
+    - name: Cleanup Exercise 1
+      if: always()
+      run: |
+        cd ${{ github.workspace }}
+        git worktree remove ../GitWorktreesTutorial-feature-a 2>/dev/null || true
+        git worktree remove ../GitWorktreesTutorial-review 2>/dev/null || true
+        git branch -D feature-a 2>/dev/null || true
+        git branch -D review-branch 2>/dev/null || true
+        git worktree prune
+
+  test-exercise-02:
+    name: 🧪 Test Exercise 2 - Parallel Features
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.exercise_number == 'all' || github.event.inputs.exercise_number == '02' || github.event.inputs.exercise_number == '' }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Git
+      run: |
+        git config user.name "Exercise Test Bot"
+        git config user.email "exercise-test@tutorial.example"
+
+    - name: Test Exercise 2 Steps
+      run: |
+        echo "🎯 Testing Exercise 2: Parallel Feature Development"
+        echo "===================================================="
+        
+        # Step 1: Create multiple feature worktrees
+        echo "🌿 Step 1: Creating feature worktrees"
+        git worktree add ../GitWorktreesTutorial-auth -b feature/authentication
+        git worktree add ../GitWorktreesTutorial-dashboard -b feature/dashboard
+        git worktree add ../GitWorktreesTutorial-ratelimit -b feature/rate-limiting
+        
+        # Step 2: Verify workspace
+        echo "📊 Step 2: Verifying workspace"
+        git worktree list
+        test -d ../GitWorktreesTutorial-auth || { echo "❌ Auth worktree missing"; exit 1; }
+        test -d ../GitWorktreesTutorial-dashboard || { echo "❌ Dashboard worktree missing"; exit 1; }
+        test -d ../GitWorktreesTutorial-ratelimit || { echo "❌ Rate limit worktree missing"; exit 1; }
+        
+        # Step 3: Simulate work in authentication worktree
+        echo "🔐 Step 3: Working on authentication"
+        cd ../GitWorktreesTutorial-auth
+        cat > auth.md << EOF
+        # Authentication Module
+        
+        ## Features
+        - User login
+        - Password validation
+        - Session management
+        EOF
+        git add auth.md
+        git commit -m "feat: add authentication module design"
+        
+        # Step 4: Simulate work in dashboard worktree
+        echo "📊 Step 4: Working on dashboard"
+        cd ../GitWorktreesTutorial-dashboard
+        cat > dashboard.md << EOF
+        # Dashboard Widgets
+        
+        ## New Widgets
+        - User stats widget
+        - Revenue chart
+        - Activity feed
+        EOF
+        git add dashboard.md
+        git commit -m "feat: add dashboard widgets specification"
+        
+        # Step 5: Simulate work in rate limiting worktree
+        echo "⚡ Step 5: Working on rate limiting"
+        cd ../GitWorktreesTutorial-ratelimit
+        cat > rate-limiting.md << EOF
+        # API Rate Limiting
+        
+        ## Requirements
+        - 100 requests per minute per user
+        - Redis for tracking
+        - Graceful degradation
+        EOF
+        git add rate-limiting.md
+        git commit -m "feat: add rate limiting design"
+        
+        # Step 6: Check progress across all features
+        echo "📈 Step 6: Checking progress across features"
+        cd ../GitWorktreesTutorial
+        git log --oneline --graph --all
+        
+        # Step 7: Simulate context switching
+        echo "🔄 Step 7: Testing context switching"
+        cd ../GitWorktreesTutorial-auth
+        echo "- Token expiration: 24 hours" >> auth.md
+        git add auth.md
+        git commit -m "feat: add token expiration specification"
+        
+        cd ../GitWorktreesTutorial-dashboard
+        echo "- Real-time updates via WebSocket" >> dashboard.md
+        git add dashboard.md
+        git commit -m "feat: add real-time updates requirement"
+        
+        # Step 8: Review changes in main worktree
+        echo "👀 Step 8: Reviewing in main worktree"
+        cd ../GitWorktreesTutorial
+        git branch -a
+        git log --oneline --graph --all --decorate
+        
+        echo "✅ Exercise 2 test completed successfully!"
+
+    - name: Cleanup Exercise 2
+      if: always()
+      run: |
+        cd ${{ github.workspace }}
+        git worktree remove ../GitWorktreesTutorial-auth 2>/dev/null || true
+        git worktree remove ../GitWorktreesTutorial-dashboard 2>/dev/null || true
+        git worktree remove ../GitWorktreesTutorial-ratelimit 2>/dev/null || true
+        git branch -D feature/authentication 2>/dev/null || true
+        git branch -D feature/dashboard 2>/dev/null || true
+        git branch -D feature/rate-limiting 2>/dev/null || true
+        git worktree prune
+
+  test-exercise-03:
+    name: 🧪 Test Exercise 3 - Hotfix Workflow
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.exercise_number == 'all' || github.event.inputs.exercise_number == '03' || github.event.inputs.exercise_number == '' }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Git
+      run: |
+        git config user.name "Exercise Test Bot"
+        git config user.email "exercise-test@tutorial.example"
+
+    - name: Test Exercise 3 Steps
+      run: |
+        echo "🎯 Testing Exercise 3: Hotfix Workflow"
+        echo "======================================"
+        
+        # Setup: Create feature work in progress
+        echo "🛠️ Setup: Creating feature work in progress"
+        git checkout -b feature/user-dashboard
+        cat > dashboard-progress.md << EOF
+        # User Dashboard Feature
+        
+        ## Progress
+        - [x] Design wireframes
+        - [x] Create component structure
+        - [ ] Implement user stats widget
+        - [ ] Add data fetching
+        - [ ] Style components
+        EOF
+        git add dashboard-progress.md
+        git commit -m "wip: user dashboard implementation in progress"
+        
+        # Simulate uncommitted work
+        echo "// Debug code" >> dashboard-progress.md
+        
+        # Step 1: Emergency strikes - check current status
+        echo "🚨 Step 1: Emergency bug report received"
+        git status
+        git branch
+        
+        # Step 2: Create hotfix worktree
+        echo "🚑 Step 2: Creating hotfix worktree"
+        git worktree add ../GitWorktreesTutorial-hotfix main
+        cd ../GitWorktreesTutorial-hotfix
+        git checkout -b hotfix/login-critical-fix
+        
+        # Step 3: Investigate and fix the bug
+        echo "🔧 Step 3: Fixing critical bug"
+        cat > login-system.md << EOF
+        # Login System
+        
+        ## Fixed Implementation
+        - Replace hardcoded password with proper auth
+        - Fix validation logic that prevented user logins
+        - Resolves production issue affecting all users
+        EOF
+        git add login-system.md
+        git commit -m "fix: resolve critical login authentication bug
+
+        - Replace hardcoded password with proper auth
+        - Fix validation logic that prevented user logins
+        - Resolves production issue affecting all users
+
+        Fixes: #PROD-2024-001"
+        
+        # Step 4: Verify feature work is untouched
+        echo "🛡️ Step 4: Verifying feature work preservation"
+        cd ../GitWorktreesTutorial
+        git status | grep -q "dashboard-progress.md" || { echo "❌ Uncommitted changes lost"; exit 1; }
+        git branch --show-current | grep -q "feature/user-dashboard" || { echo "❌ Wrong branch"; exit 1; }
+        test -f dashboard-progress.md || { echo "❌ Feature file missing"; exit 1; }
+        
+        # Step 5: Deploy hotfix (simulation)
+        echo "🚀 Step 5: Deploying hotfix"
+        cd ../GitWorktreesTutorial-hotfix
+        git checkout main
+        git merge hotfix/login-critical-fix
+        echo "Hotfix deployed successfully!" > deployment-log.md
+        git add deployment-log.md
+        git commit -m "deploy: hotfix v1.0.1 to production"
+        
+        # Step 6: Return to feature work
+        echo "🔄 Step 6: Returning to feature work"
+        cd ../GitWorktreesTutorial
+        git status | grep -q "dashboard-progress.md" || { echo "❌ Feature context lost"; exit 1; }
+        echo "# Additional work" >> dashboard-progress.md
+        git add dashboard-progress.md
+        git commit -m "feat: continue dashboard implementation after hotfix"
+        
+        # Step 7: Sync hotfix to feature branch
+        echo "🔗 Step 7: Syncing hotfix to feature"
+        git merge main
+        test -f login-system.md || { echo "❌ Hotfix not merged"; exit 1; }
+        test -f dashboard-progress.md || { echo "❌ Feature work lost"; exit 1; }
+        
+        echo "✅ Exercise 3 test completed successfully!"
+
+    - name: Cleanup Exercise 3
+      if: always()
+      run: |
+        cd ${{ github.workspace }}
+        git checkout main 2>/dev/null || true
+        git worktree remove ../GitWorktreesTutorial-hotfix 2>/dev/null || true
+        git branch -D feature/user-dashboard 2>/dev/null || true
+        git branch -D hotfix/login-critical-fix 2>/dev/null || true
+        git worktree prune
+        git reset --hard HEAD~10 2>/dev/null || true  # Clean up commits
+
+  test-validation-script:
+    name: 🧪 Test Validation Script
+    runs-on: ubuntu-latest
+    needs: [test-exercise-01, test-exercise-02, test-exercise-03]
+    if: always()
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Git
+      run: |
+        git config user.name "Validation Test Bot"
+        git config user.email "validation-test@tutorial.example"
+
+    - name: Test validation script syntax
+      run: |
+        echo "🧪 Testing validation script"
+        
+        # Test script syntax
+        bash -n scripts/validate-exercise.sh
+        echo "✅ Validation script syntax is correct"
+        
+        # Test with invalid exercise number
+        ./scripts/validate-exercise.sh invalid 2>&1 | grep -q "Invalid exercise number" || {
+          echo "❌ Error handling not working"
+          exit 1
+        }
+        echo "✅ Error handling works correctly"
+        
+        # Test help output
+        ./scripts/validate-exercise.sh 2>&1 | grep -q "Usage:" || {
+          echo "❌ Help output not working"
+          exit 1
+        }
+        echo "✅ Help output works correctly"
+
+  generate-exercise-report:
+    name: 📊 Generate Exercise Test Report  
+    runs-on: ubuntu-latest
+    needs: [test-exercise-01, test-exercise-02, test-exercise-03, test-validation-script]
+    if: always()
+    
+    steps:
+    - name: Generate exercise test report
+      run: |
+        echo "📊 Exercise Test Report"
+        echo "======================"
+        echo "Date: $(date)"
+        echo "Trigger: ${{ github.event_name }}"
+        echo ""
+        echo "Test Results:"
+        echo "- Exercise 1 (Basic Operations): ${{ needs.test-exercise-01.result }}"
+        echo "- Exercise 2 (Parallel Features): ${{ needs.test-exercise-02.result }}" 
+        echo "- Exercise 3 (Hotfix Workflow): ${{ needs.test-exercise-03.result }}"
+        echo "- Validation Script: ${{ needs.test-validation-script.result }}"
+        echo ""
+        
+        # Count successful tests
+        success_count=0
+        if [ "${{ needs.test-exercise-01.result }}" = "success" ]; then success_count=$((success_count + 1)); fi
+        if [ "${{ needs.test-exercise-02.result }}" = "success" ]; then success_count=$((success_count + 1)); fi
+        if [ "${{ needs.test-exercise-03.result }}" = "success" ]; then success_count=$((success_count + 1)); fi
+        if [ "${{ needs.test-validation-script.result }}" = "success" ]; then success_count=$((success_count + 1)); fi
+        
+        echo "✅ Successful tests: $success_count/4"
+        
+        if [ "$success_count" -eq 4 ]; then
+          echo "🎉 All exercise tests passed!"
+          echo "The tutorial exercises are working correctly."
+        else
+          echo "⚠️ Some exercise tests failed."
+          echo "Please review the individual test results above."
+        fi
+        
+        echo ""
+        echo "💡 Note: Exercise 4 (AI Agents) and Exercise 5 (Cleanup) require"
+        echo "   more complex testing environments and are validated separately."
+        
+        # Ensure script exits successfully
+        exit 0

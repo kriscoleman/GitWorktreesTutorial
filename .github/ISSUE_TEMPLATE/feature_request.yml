@@ -1,0 +1,130 @@
+name: ✨ Feature Request
+description: Suggest a new feature or improvement for the Git Worktrees Tutorial
+title: "[Feature] "
+labels: ["enhancement", "needs-review"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a new feature! Your ideas help make this tutorial better for everyone.
+
+  - type: dropdown
+    id: feature_category
+    attributes:
+      label: Feature Category
+      description: What type of feature are you requesting?
+      options:
+        - New Exercise
+        - Script Enhancement
+        - Documentation Improvement
+        - Sample Project Addition
+        - Workflow Pattern
+        - AI Integration Feature
+        - Automation Tool
+        - Educational Content
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: feature_description
+    attributes:
+      label: Feature Description
+      description: A clear and detailed description of the feature you'd like to see
+      placeholder: Describe the feature...
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem_solved
+    attributes:
+      label: Problem This Solves
+      description: What problem does this feature solve? What use case does it address?
+      placeholder: This feature would help with...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed Solution
+      description: How would you like this feature to work?
+      placeholder: The feature could work by...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives_considered
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered any alternative solutions or workarounds?
+      placeholder: I've also considered...
+
+  - type: dropdown
+    id: target_audience
+    attributes:
+      label: Target Audience
+      description: Who would benefit most from this feature?
+      options:
+        - Beginners learning git worktrees
+        - Experienced developers
+        - AI-assisted development users
+        - Team leads and managers
+        - DevOps engineers
+        - All users
+      multiple: true
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Implementation Complexity
+      description: How complex do you think this feature would be to implement?
+      options:
+        - Simple (documentation update, minor script change)
+        - Moderate (new exercise, significant script enhancement)
+        - Complex (major new functionality, extensive testing needed)
+        - Not sure
+
+  - type: textarea
+    id: example_usage
+    attributes:
+      label: Example Usage
+      description: Can you provide an example of how this feature would be used?
+      placeholder: |
+        # Example command or workflow
+        git worktree add ../project-feature new-feature
+        ./scripts/your-new-feature.sh
+      render: shell
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any other context, mockups, or examples that would help explain this feature
+      placeholder: Links to similar implementations, screenshots, etc.
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution Interest
+      description: Are you interested in contributing to this feature?
+      options:
+        - label: I'd be willing to help implement this feature
+        - label: I'd be willing to help test this feature
+        - label: I'd be willing to help document this feature
+        - label: I'm just suggesting the idea for now
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: This feature aligns with the tutorial's educational goals
+          required: true
+        - label: I have provided a clear description and use case
+          required: true

@@ -1,0 +1,352 @@
+name: 🧪 Validate Tutorial
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run weekly to catch any issues with the tutorial
+    - cron: '0 0 * * 0'
+
+jobs:
+  validate-structure:
+    name: 📁 Validate Repository Structure
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Check required files exist
+      run: |
+        echo "🔍 Checking repository structure..."
+        
+        # Check main files
+        test -f README.md || { echo "❌ Missing README.md"; exit 1; }
+        test -f LICENSE || { echo "⚠️ Missing LICENSE file"; }
+        
+        # Check exercise directories
+        for i in {01..05}; do
+          case $i in
+            01) dir="exercises/01-basic-worktree" ;;
+            02) dir="exercises/02-parallel-features" ;;
+            03) dir="exercises/03-hotfix-workflow" ;;
+            04) dir="exercises/04-ai-agents" ;;
+            05) dir="exercises/05-cleanup" ;;
+          esac
+          test -d "$dir" || { echo "❌ Missing exercise $i directory: $dir"; exit 1; }
+          test -f "$dir/README.md" || { echo "❌ Missing README in exercise $i"; exit 1; }
+        done
+        
+        # Check scripts
+        test -d scripts || { echo "❌ Missing scripts directory"; exit 1; }
+        test -f scripts/setup-worktrees.sh || { echo "❌ Missing setup script"; exit 1; }
+        test -f scripts/cleanup-worktrees.sh || { echo "❌ Missing cleanup script"; exit 1; }
+        test -f scripts/worktree-status.sh || { echo "❌ Missing status script"; exit 1; }
+        test -f scripts/validate-exercise.sh || { echo "❌ Missing validation script"; exit 1; }
+        
+        # Check documentation
+        test -d docs || { echo "❌ Missing docs directory"; exit 1; }
+        test -f docs/CHEATSHEET.md || { echo "❌ Missing cheatsheet"; exit 1; }
+        test -f docs/BEST_PRACTICES.md || { echo "❌ Missing best practices"; exit 1; }
+        test -f docs/AI_DEVELOPMENT.md || { echo "❌ Missing AI development guide"; exit 1; }
+        
+        # Check sample project
+        test -d sample-project || { echo "❌ Missing sample project"; exit 1; }
+        test -f sample-project/README.md || { echo "❌ Missing sample project README"; exit 1; }
+        test -f sample-project/package.json || { echo "❌ Missing sample project package.json"; exit 1; }
+        
+        echo "✅ Repository structure validation passed!"
+
+  validate-scripts:
+    name: 🔧 Validate Scripts
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Check script permissions and syntax
+      run: |
+        echo "🔍 Validating scripts..."
+        
+        # Check all scripts are executable
+        for script in scripts/*.sh; do
+          if [ -f "$script" ]; then
+            if [ ! -x "$script" ]; then
+              echo "❌ Script not executable: $script"
+              exit 1
+            fi
+            echo "✅ $script is executable"
+            
+            # Basic syntax check
+            bash -n "$script" || { echo "❌ Syntax error in $script"; exit 1; }
+            echo "✅ $script syntax is valid"
+          fi
+        done
+        
+        echo "✅ All scripts validation passed!"
+
+  test-basic-workflow:
+    name: 🌳 Test Basic Worktree Workflow
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Test basic worktree operations
+      run: |
+        echo "🧪 Testing basic worktree operations..."
+        
+        # Ensure we're in a git repository
+        git config user.name "CI Test"
+        git config user.email "ci@test.example"
+        
+        # Test basic worktree commands
+        echo "📋 Current worktrees:"
+        git worktree list
+        
+        # Create test worktree
+        echo "➕ Creating test worktree..."
+        git worktree add ../test-worktree -b test-branch
+        
+        # Verify worktree was created
+        git worktree list | grep -q "test-worktree" || { echo "❌ Test worktree not found"; exit 1; }
+        echo "✅ Test worktree created successfully"
+        
+        # Test navigation
+        cd ../test-worktree
+        pwd
+        git branch --show-current | grep -q "test-branch" || { echo "❌ Wrong branch in worktree"; exit 1; }
+        echo "✅ Worktree navigation successful"
+        
+        # Return to main directory
+        cd ../GitWorktreesTutorial
+        
+        # Clean up test worktree
+        git worktree remove ../test-worktree
+        git branch -d test-branch
+        
+        echo "✅ Basic worktree workflow test passed!"
+
+  test-scripts:
+    name: 🚀 Test Tutorial Scripts
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Test setup script
+      run: |
+        echo "🧪 Testing setup script..."
+        
+        git config user.name "CI Test"
+        git config user.email "ci@test.example"
+        
+        # Run setup script (dry run mode for CI)
+        export CI_MODE=true
+        # Note: We can't actually run the full setup in CI due to directory conflicts
+        # but we can test that the script runs without syntax errors
+        bash -n scripts/setup-worktrees.sh
+        echo "✅ Setup script syntax is valid"
+
+    - name: Test status script
+      run: |
+        echo "🧪 Testing status script..."
+        bash -n scripts/worktree-status.sh
+        echo "✅ Status script syntax is valid"
+
+    - name: Test cleanup script
+      run: |
+        echo "🧪 Testing cleanup script..."
+        bash -n scripts/cleanup-worktrees.sh
+        echo "✅ Cleanup script syntax is valid"
+
+    - name: Test validation script  
+      run: |
+        echo "🧪 Testing validation script..."
+        bash -n scripts/validate-exercise.sh
+        echo "✅ Validation script syntax is valid"
+
+  validate-documentation:
+    name: 📚 Validate Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Check documentation links
+      run: |
+        echo "🔍 Checking documentation links..."
+        
+        # Check for broken internal links in README
+        if grep -n "](exercises/" README.md | grep -v -E "exercises/0[1-5]-(basic-worktree|parallel-features|hotfix-workflow|ai-agents|cleanup)"; then
+          echo "❌ Found potentially broken exercise links in README"
+          exit 1
+        fi
+        
+        # Check exercise cross-references
+        for exercise_dir in exercises/*/; do
+          if [ -f "$exercise_dir/README.md" ]; then
+            echo "📖 Checking $exercise_dir/README.md"
+            # Basic link validation (could be enhanced)
+            if grep -q "](../" "$exercise_dir/README.md"; then
+              echo "✅ $exercise_dir has relative links"
+            fi
+          fi
+        done
+        
+        echo "✅ Documentation validation passed!"
+
+    - name: Check markdown formatting
+      run: |
+        echo "📝 Checking markdown formatting..."
+        
+        # Basic markdown checks
+        find . -name "*.md" -exec grep -l "^#[^#]" {} \; | while read file; do
+          echo "📄 Checking $file has proper headings"
+          # Check if file has proper heading structure
+          head -1 "$file" | grep -q "^# " || echo "⚠️ $file may not start with h1 heading"
+        done
+        
+        echo "✅ Markdown formatting check passed!"
+
+  test-sample-project:
+    name: 📦 Test Sample Project
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Test sample project structure
+      run: |
+        echo "🧪 Testing sample project..."
+        
+        cd sample-project
+        
+        # Check package.json is valid
+        node -e "JSON.parse(require('fs').readFileSync('package.json', 'utf8'))" || {
+          echo "❌ Invalid package.json"
+          exit 1
+        }
+        echo "✅ package.json is valid JSON"
+        
+        # Check if main files exist
+        test -f src/backend/server.js || { echo "❌ Missing backend server"; exit 1; }
+        test -f src/frontend/App.js || { echo "❌ Missing frontend app"; exit 1; }
+        echo "✅ Sample project structure is valid"
+        
+        # Test that the server file has no obvious syntax errors
+        node -c src/backend/server.js || { echo "❌ Backend syntax error"; exit 1; }
+        echo "✅ Backend JavaScript syntax is valid"
+
+  validate-git-requirements:
+    name: ⚙️ Validate Git Requirements
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check Git version
+      run: |
+        echo "🔍 Checking Git version..."
+        git --version
+        
+        # Check if Git version is 2.5 or higher (when worktrees were introduced)
+        git_version=$(git --version | awk '{print $3}')
+        echo "Git version: $git_version"
+        
+        # Simple version check (assumes semantic versioning)
+        major=$(echo $git_version | cut -d. -f1)
+        minor=$(echo $git_version | cut -d. -f2)
+        
+        if [ "$major" -gt 2 ] || ([ "$major" -eq 2 ] && [ "$minor" -ge 5 ]); then
+          echo "✅ Git version $git_version supports worktrees"
+        else
+          echo "❌ Git version $git_version may not support worktrees (requires 2.5+)"
+          exit 1
+        fi
+
+  integration-test:
+    name: 🔗 Integration Test
+    runs-on: ubuntu-latest
+    needs: [validate-structure, validate-scripts, test-basic-workflow]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Run integration test
+      run: |
+        echo "🧪 Running integration test..."
+        
+        git config user.name "CI Integration Test"
+        git config user.email "ci-integration@test.example"
+        
+        # Simulate a user going through the tutorial
+        echo "📚 Step 1: Reading main README"
+        test -f README.md && echo "✅ Main README exists"
+        
+        echo "📚 Step 2: Checking prerequisites"
+        git --version
+        
+        echo "📚 Step 3: Exploring exercises"
+        ls -la exercises/
+        
+        echo "📚 Step 4: Testing a simple worktree workflow"
+        git worktree add ../integration-test -b integration-test-branch
+        cd ../integration-test
+        echo "Hello from integration test!" > test-file.txt
+        git add test-file.txt
+        git commit -m "Integration test commit"
+        
+        echo "📚 Step 5: Returning to main directory and cleanup"
+        cd ../GitWorktreesTutorial
+        git worktree remove ../integration-test
+        git branch -D integration-test-branch
+        
+        echo "✅ Integration test passed!"
+
+  generate-report:
+    name: 📊 Generate Validation Report
+    runs-on: ubuntu-latest
+    needs: [validate-structure, validate-scripts, test-basic-workflow, test-scripts, validate-documentation, test-sample-project, validate-git-requirements, integration-test]
+    if: always()
+    
+    steps:
+    - name: Generate validation report
+      run: |
+        echo "📊 Git Worktrees Tutorial Validation Report"
+        echo "============================================="
+        echo "Date: $(date)"
+        echo "Repository: ${{ github.repository }}"
+        echo "Commit: ${{ github.sha }}"
+        echo ""
+        echo "Validation Results:"
+        echo "- Repository Structure: ${{ needs.validate-structure.result }}"
+        echo "- Scripts Validation: ${{ needs.validate-scripts.result }}"
+        echo "- Basic Workflow Test: ${{ needs.test-basic-workflow.result }}"
+        echo "- Scripts Testing: ${{ needs.test-scripts.result }}"
+        echo "- Documentation: ${{ needs.validate-documentation.result }}"
+        echo "- Sample Project: ${{ needs.test-sample-project.result }}"
+        echo "- Git Requirements: ${{ needs.validate-git-requirements.result }}"
+        echo "- Integration Test: ${{ needs.integration-test.result }}"
+        echo ""
+        if [ "${{ needs.validate-structure.result }}" = "success" ] && \
+           [ "${{ needs.validate-scripts.result }}" = "success" ] && \
+           [ "${{ needs.test-basic-workflow.result }}" = "success" ] && \
+           [ "${{ needs.integration-test.result }}" = "success" ]; then
+          echo "🎉 Overall Status: PASSED ✅"
+          echo "The Git Worktrees Tutorial is ready for use!"
+        else
+          echo "❌ Overall Status: FAILED"
+          echo "Some validation checks failed. Please review the results above."
+        fi
