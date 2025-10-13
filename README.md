@@ -104,6 +104,35 @@ This repository includes several scripts to help you practice:
 - [Best Practices](docs/BEST_PRACTICES.md) - Advanced workflows and tips
 - [AI Development Guide](docs/AI_DEVELOPMENT.md) - Using worktrees with AI coding tools
 
+## 🎬 Presentation
+
+This repository includes a comprehensive [Slidev](https://sli.dev/) presentation to showcase Git worktrees concepts and tutorial overview.
+
+### Running the Presentation
+
+```bash
+cd slides
+npm install  # First time only
+npm run dev  # Start presentation server
+```
+
+The presentation covers:
+- Problem statement and Git worktrees solution
+- Real-world scenarios and use cases  
+- Tutorial repository walkthrough
+- Exercise highlights with code examples
+- Best practices and AI development workflows
+
+### Presentation Commands
+```bash
+npm run dev      # Development server with hot reload
+npm run build    # Build for production deployment
+npm run preview  # Preview production build
+npm run export   # Export slides to PDF
+```
+
+**💡 Perfect for:** Team presentations, conference talks, or personal learning reinforcement.
+
 ## 🏗️ Sample Project
 
 The `sample-project/` directory contains a simple web application with intentional bugs and TODO items for practicing worktree workflows in realistic scenarios.

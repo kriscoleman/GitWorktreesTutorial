@@ -1,0 +1,20 @@
+{
+  "name": "slides",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "slidev build",
+    "dev": "slidev --open",
+    "export": "slidev export",
+    "preview": "slidev preview"
+  },
+  "keywords": [],
+  "author": "Kris Coleman",
+  "license": "ISC",
+  "description": "Slidev presentation for Git Worktrees Tutorial",
+  "devDependencies": {
+    "@slidev/cli": "^52.2.5",
+    "@slidev/theme-default": "^0.25.0",
+    "playwright-chromium": "^1.56.0"
+  }
+}
